@@ -1,0 +1,9 @@
+StudentID,Name,Age,Gender,Department,Semester,CGPA,City
+101,Ali Khan,20,Male,Software Engineering,3,3.45,Lahore
+102,Sara Ahmed,21,Female,Computer Science,5,3.82,Islamabad
+103,Ahmed Raza,22,Male,Artificial Intelligence,6,3.60,Karachi
+104,Ayesha Noor,20,Female,Data Science,4,3.91,Peshawar
+105,Usman Tariq,23,Male,Cyber Security,7,3.30,Rawalpindi
+106,Moaz Sultan,21,Male,Software Engineering,4,3.85,Islamabad
+107,Aslam,25,Male,Computer Engineering,8,3.40,Sahiwal
+108,Statam,19,Male,Economics,6,4.00,Texas

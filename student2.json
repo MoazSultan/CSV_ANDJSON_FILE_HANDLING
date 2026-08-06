@@ -1,0 +1,16 @@
+{
+    "university": {
+        "name": "COMSATS",
+        "department": {
+            "name": "Software Engineering",
+            "students": [
+                {
+                    "name": "Ali"
+                },
+                {
+                    "name": "Moaz"
+                }
+            ]
+        }
+    }
+}

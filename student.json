@@ -1,0 +1,10 @@
+{
+    "student": {
+        "personal": {
+            "address": {
+                "city": "Islamabad",
+                "country": "Pakistan"
+            }
+        }
+    }
+}
