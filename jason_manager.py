@@ -41,6 +41,20 @@ class JSONManager:
 
 
 
+    def parse_path(self, path_input):
+        """Split a path like 'University / CS/ ' into clean, non-empty
+        segments: ['University', 'CS']. Strips whitespace around each
+        segment and drops empty ones caused by leading/trailing/double
+        slashes."""
+
+        raw_parts = path_input.split("/")
+
+        clean_parts = [p.strip() for p in raw_parts if p.strip() != ""]
+
+        return clean_parts
+
+
+
     def get_nested_value(self, data, path_list):
 
         current = data
@@ -142,9 +156,9 @@ class JSONManager:
         print("\nEnter path where to add data (e.g., University/CS/Semester1)")
         path_input = input("Enter path: ")
 
-        path_list = path_input.split("/")
+        path_list = self.parse_path(path_input)
 
-        if len(path_list) < 1 or path_list[0] == "":
+        if len(path_list) < 1:
             print("Invalid path.")
             return
 
@@ -177,16 +191,36 @@ class JSONManager:
 
         data = self.read_file()
 
-        print("\nEnter path where to add empty object (e.g., University/CS/Semester1)")
+        print("\nEnter parent path where to add the object (e.g., University/CS/Semester1)")
+        print("Leave blank to add it at the top level.")
         path_input = input("Enter path: ")
 
-        path_list = path_input.split("/")
+        path_list = self.parse_path(path_input)
 
-        if len(path_list) < 1 or path_list[0] == "":
-            print("Invalid path.")
-            return
+        # Empty path means "add at root" - a deliberate choice, not a typo.
+        if path_list:
+            target = self.get_nested_value(data, path_list)
+
+            if target is None:
+                print("Parent path not found. Create it first (or check spelling).")
+                return
+
+            if not isinstance(target, dict):
+                print("Cannot add an object here because this path is not an object.")
+                return
+        else:
+            target = data
 
         obj_name = input("Enter object name to create: ")
+
+        if obj_name in target:
+            confirm = input(
+                f"'{obj_name}' already exists here and has data under it. "
+                f"Overwrite it and everything inside it? (y/n): "
+            )
+            if confirm.strip().lower() != "y":
+                print("Cancelled. No changes made.")
+                return
 
         num_items = int(input("Enter number of key-value pairs inside this object: "))
 
@@ -199,9 +233,7 @@ class JSONManager:
 
             new_obj[k] = v
 
-        full_path = path_list + [obj_name]
-
-        data = self.set_nested_value(data, full_path, new_obj)
+        target[obj_name] = new_obj
 
         self.write_file(data)
 
@@ -216,7 +248,11 @@ class JSONManager:
         print("\nEnter path to data you want to change (e.g., University/CS/Semester1/Ali)")
         path_input = input("Enter path: ")
 
-        path_list = path_input.split("/")
+        path_list = self.parse_path(path_input)
+
+        if len(path_list) < 1:
+            print("Invalid path.")
+            return
 
         current_value = self.get_nested_value(data, path_list)
 
@@ -224,7 +260,18 @@ class JSONManager:
             print("Path not found.")
             return
 
-        print(f"\nCurrent value at this path: {current_value}")
+        if isinstance(current_value, dict):
+            print(f"\nThis path points to a whole object, not a single value:")
+            print(json.dumps(current_value, indent=4))
+            confirm = input(
+                "\nReplacing it will DELETE everything inside it and replace it "
+                "with a single text value. Continue? (y/n): "
+            )
+            if confirm.strip().lower() != "y":
+                print("Cancelled. No changes made.")
+                return
+        else:
+            print(f"\nCurrent value at this path: {current_value}")
 
         new_value = input("Enter new value: ")
 
@@ -243,7 +290,11 @@ class JSONManager:
         print("\nEnter path to delete (e.g., University/CS/Semester1/Ali)")
         path_input = input("Enter path: ")
 
-        path_list = path_input.split("/")
+        path_list = self.parse_path(path_input)
+
+        if len(path_list) < 1:
+            print("Invalid path.")
+            return
 
         result = self.delete_nested_value(data, path_list)
 
@@ -262,14 +313,18 @@ class JSONManager:
         print("\nEnter path to read (e.g., University/CS/Semester1)")
         path_input = input("Enter path: ")
 
-        path_list = path_input.split("/")
+        path_list = self.parse_path(path_input)
+
+        if len(path_list) < 1:
+            print("Invalid path.")
+            return
 
         value = self.get_nested_value(data, path_list)
 
         if value is None:
             print("Path not found.")
         else:
-            print(f"\nValue at path '{path_input}':")
+            print(f"\nValue at path '{'/'.join(path_list)}':")
             if isinstance(value, dict):
                 print(json.dumps(value, indent=4))
             else:

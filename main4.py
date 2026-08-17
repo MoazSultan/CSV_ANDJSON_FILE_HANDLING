@@ -173,6 +173,65 @@ class Student:
         print("Column deleted successfully.")
 
 
+
+    def update_row(self):
+
+        data = self.read_file()
+
+        header = data[0]
+
+        roll = input("Enter Roll Number to update: ").strip()
+
+        target_row = None
+
+        for row in data[1:]:
+            if row[0].strip().lower() == roll.lower():
+                target_row = row
+                break
+
+        if target_row is None:
+            print("Roll Number not found.")
+            return
+
+        print("\nCurrent Data:")
+
+        for i in range(len(header)):
+            print(f"{i + 1}. {header[i]}: {target_row[i]}")
+
+        # lowercase-name -> actual index, so lookups are case/space tolerant
+        header_lookup = {h.strip().lower(): i for i, h in enumerate(header)}
+
+        print("\nEnter the column name to update (or 'done' to finish):")
+
+        while True:
+
+            column = input("\nColumn name: ").strip()
+
+            if column.lower() == "done":
+                break
+
+            key = column.lower()
+
+            if key not in header_lookup:
+                print("Column not found. Check spelling and try again.")
+                continue
+
+            index = header_lookup[key]
+            actual_name = header[index]
+
+            new_value = input(f"Enter new value for {actual_name} [{target_row[index]}]: ")
+
+            if new_value != "":
+                target_row[index] = new_value
+                print(f"{actual_name} updated.")
+            else:
+                print("No change (empty value).")
+
+        self.write_file(data)
+        print("Row updated successfully.")
+
+
+
 def main():
 
     s = Student()
@@ -186,7 +245,8 @@ def main():
         print("4. Delete Row")
         print("5. Delete Column")
         print("6. Display CSV Data")
-        print("7. Exit")
+        print("7. Update Row")
+        print("8. Exit")
 
         try:
             choice = int(input("Enter your choice: "))
@@ -213,6 +273,9 @@ def main():
             s.display_data()
 
         elif choice == 7:
+            s.update_row()
+
+        elif choice == 8:
             print("Exiting...")
             break
 
